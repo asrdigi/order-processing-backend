@@ -15,15 +15,17 @@ const app = express();
 
 app.set('etag', false);
 
-// Middleware, allow all origins
-app.use(cors());
-
-
-// app.use(cors({
-//   origin: 'http://localhost:4200',
-//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//   allowedHeaders: ['Content-Type']
-// }));
+// CORS Configuration - Allow Vercel frontend
+app.use(cors({
+  origin: [
+    'http://localhost:4200',
+    'https://order-processing-frontend-g0gn1qfj2-asrdigis-projects.vercel.app',
+    'https://order-processing-frontend.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 
 app.use(express.json());
