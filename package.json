@@ -1,4 +1,11 @@
 {
+  "name": "order-processing-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
@@ -9,6 +16,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
-  },
-  "type": "module"
+  }
 }
