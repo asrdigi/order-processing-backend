@@ -18,12 +18,20 @@ app.set('etag', false);
 
 // CORS Configuration - Allow Vercel frontend
 app.use(cors({
-  origin: [
-    'http://localhost:4200',
-    'https://order-processing-frontend-g0gn1qfj2-asrdigis-projects.vercel.app',
-    'https://order-processing-frontend.vercel.app',
-    'https://order-processing-frontend-git-main-asrdigis-projects.vercel.app'
-  ],
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:4200',
+      /^https:\/\/order-processing-frontend.*\.vercel\.app$/
+    ];
+    
+    if (!origin || allowedOrigins.some(allowed => 
+      typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
+    )) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
