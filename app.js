@@ -21,7 +21,8 @@ app.use(cors({
   origin: [
     'http://localhost:4200',
     'https://order-processing-frontend-g0gn1qfj2-asrdigis-projects.vercel.app',
-    'https://order-processing-frontend.vercel.app'
+    'https://order-processing-frontend.vercel.app',
+    'https://order-processing-frontend-git-main-asrdigis-projects.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
