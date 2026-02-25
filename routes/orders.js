@@ -29,14 +29,15 @@ const router = Router();
 
 router.get("/", authenticateToken, async (req, res) => {
  try {
+   console.log("GET /orders - Fetching orders for user:", req.user.customer_id);
 
    // ADMIN → all orders
    if (req.user.role === "ADMIN") {
      const [rows] = await pool.query(`
-     SELECT o.order_id, o.total_amount, o.status,
+     SELECT o.order_id, o.total_amount, o.status, o.order_date,
             c.full_name
      FROM orders o
-     JOIN customers c ON o.customer_id = c.customer_id
+     JOIN customers c ON o.customer_id = c.customer_id ORDER BY o.order_id DESC
    `);
 
    return res.json(rows);
@@ -46,9 +47,9 @@ router.get("/", authenticateToken, async (req, res) => {
    // USER → only his orders
    // USER → only his orders
  const [rows] = await pool.query(
-   `SELECT order_id, total_amount, status
+   `SELECT order_id, total_amount, status, order_date
     FROM orders
-    WHERE customer_id = ?`,
+    WHERE customer_id = ? ORDER BY order_id DESC`,
    [req.user.customer_id]
  );
 
@@ -74,7 +75,7 @@ router.post("/", authenticateToken, async (req, res) => {
    await connection.beginTransaction();
 
    const [orderResult] = await connection.query(
-     `INSERT INTO orders (customer_id) VALUES (?)`,
+     `INSERT INTO orders (customer_id, order_date) VALUES (?, NOW())`,
      [req.user.customer_id]
    );
 
