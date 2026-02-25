@@ -5,6 +5,7 @@ import products from "./routes/products.js";
 import orders from "./routes/orders.js";
 import users from "./routes/users.js";
 import orderItems from "./routes/order-items.js";
+import pool from "./db/pool.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -29,6 +30,28 @@ app.use(cors({
 
 
 app.use(express.json());
+
+// Debug endpoint to check database tables
+app.get("/api/debug/tables", async (req, res) => {
+  try {
+    const [tables] = await pool.query('SHOW TABLES');
+    const tableNames = tables.map(t => Object.values(t)[0]);
+    
+    const tableInfo = {};
+    for (const tableName of tableNames) {
+      const [rows] = await pool.query(`SELECT COUNT(*) as count FROM ${tableName}`);
+      tableInfo[tableName] = rows[0].count;
+    }
+    
+    res.json({
+      success: true,
+      tables: tableNames,
+      counts: tableInfo
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Routes (versioned)
 app.use("/api/v1/customers", customers);
