@@ -12,11 +12,11 @@ router.get("/", authenticateToken, async (req, res, next) => {
   try {
     // console.log("GET /customers called by user", req.user.username);
     const [rows] = await pool.query(`
-    SELECT customer_id, full_name, email, phone
+    SELECT customer_id, full_name, email, phone, address
     FROM customers
   `);
 
-  res.json(rows);
+    res.json(rows);
   } catch (err) {
     next(err);
   }
@@ -26,12 +26,12 @@ router.get("/", authenticateToken, async (req, res, next) => {
 // =============================
 // GET CUSTOMER BY ID
 // =============================
-router.get("/:id", authenticateToken,async (req, res, next) => {
+router.get("/:id", authenticateToken, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
 
     const [rows] = await pool.query(
-      "SELECT customer_id, full_name, email, phone FROM customers WHERE customer_id = ?",
+      "SELECT customer_id, full_name, email, phone, address FROM customers WHERE customer_id = ?",
       [id]
     );
 
@@ -49,11 +49,11 @@ router.get("/:id", authenticateToken,async (req, res, next) => {
 // =============================
 // CREATE CUSTOMER
 // =============================
-router.post("/", authenticateToken, authorizeRole("ADMIN"),async (req, res, next) => {
+router.post("/", authenticateToken, authorizeRole("ADMIN"), async (req, res, next) => {
   const connection = await pool.getConnection();
-  
+
   try {
-    const { full_name, email, phone } = req.body;
+    const { full_name, email, phone, address } = req.body;
 
     await connection.beginTransaction();
 
@@ -70,18 +70,19 @@ router.post("/", authenticateToken, authorizeRole("ADMIN"),async (req, res, next
 
     // Create customer with same ID
     await connection.query(
-      `INSERT INTO customers (customer_id, full_name, email, phone)
-      VALUES (?, ?, ?, ?)`,
-      [userId, full_name, email, phone || null]
+      `INSERT INTO customers (customer_id, full_name, email, phone, address)
+      VALUES (?, ?, ?, ?, ?)`,
+      [userId, full_name, email, phone || null, address || null]
     );
 
     await connection.commit();
 
-    res.json({ 
+    res.json({
       customer_id: userId,
       full_name,
       email,
-      phone
+      phone,
+      address
     });
 
   } catch (err) {
@@ -99,14 +100,14 @@ router.post("/", authenticateToken, authorizeRole("ADMIN"),async (req, res, next
 // =============================
 // UPDATE CUSTOMER
 // =============================
-router.put("/:id", authenticateToken, authorizeRole("ADMIN"),async (req, res, next) => {
+router.put("/:id", authenticateToken, authorizeRole("ADMIN"), async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const { full_name, email, phone } = req.body;
+    const { full_name, email, phone, address } = req.body;
 
     const [result] = await pool.query(
-      "UPDATE customers SET full_name = ?, email = ?, phone = ? WHERE customer_id = ?",
-      [full_name, email, phone || null, id]
+      "UPDATE customers SET full_name = ?, email = ?, phone = ?, address = ? WHERE customer_id = ?",
+      [full_name, email, phone || null, address || null, id]
     );
 
     if (result.affectedRows === 0) {
@@ -114,7 +115,7 @@ router.put("/:id", authenticateToken, authorizeRole("ADMIN"),async (req, res, ne
     }
 
     const [rows] = await pool.query(
-      "SELECT customer_id, full_name, email, phone FROM customers WHERE customer_id = ?",
+      "SELECT customer_id, full_name, email, phone, address FROM customers WHERE customer_id = ?",
       [id]
     );
 
@@ -129,7 +130,7 @@ router.put("/:id", authenticateToken, authorizeRole("ADMIN"),async (req, res, ne
 // =============================
 // DELETE CUSTOMER
 // =============================
-router.delete("/:id", authenticateToken, authorizeRole("ADMIN"),async (req, res, next) => {
+router.delete("/:id", authenticateToken, authorizeRole("ADMIN"), async (req, res, next) => {
   try {
     const id = Number(req.params.id);
 
