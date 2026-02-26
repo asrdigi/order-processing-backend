@@ -134,6 +134,21 @@ router.put(
 });
 
 /* ==============================
+   DELETE ORDER
+================================ */
+router.delete("/:order_id", authenticateToken, async (req, res) => {
+  try {
+    await pool.query(
+      `DELETE FROM orders WHERE order_id = ?`,
+      [req.params.order_id]
+    );
+    res.json({ message: "Order deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* ==============================
    GET ORDER ITEMS
 ================================ */
 router.get("/:order_id/items", authenticateToken, async (req, res) => {
