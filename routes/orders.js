@@ -134,6 +134,13 @@ router.put(
   });
 
 /* ==============================
+   TEST ENDPOINT - Verify deployment
+================================ */
+router.get("/test-delete-route", (req, res) => {
+  res.json({ message: "DELETE route is deployed", timestamp: new Date().toISOString() });
+});
+
+/* ==============================
    DELETE ORDER
 ================================ */
 router.delete("/:order_id", authenticateToken, async (req, res) => {
