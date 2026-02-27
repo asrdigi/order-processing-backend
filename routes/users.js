@@ -155,6 +155,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
         {
           user_id: user.user_id,
+          username: user.username,
           role: user.role,
           customer_id: user.user_id   // 1–1 mapping
         },
